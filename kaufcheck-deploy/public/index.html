@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kaufcheck Demo — Modellspezifische Checkliste</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #14171A;
+    --panel: #1D2124;
+    --panel-2: #242830;
+    --border: #2E3338;
+    --text: #ECEDEE;
+    --muted: #8A9299;
+    --accent: #E2542A;
+    --accent-dim: #7A2E17;
+    --ok: #4F9D6E;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 56px 22px 80px;
+  }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+
+  .eyebrow .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px rgba(226,84,42,0.15);
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    max-width: 20ch;
+  }
+
+  .lede {
+    margin-top: 14px;
+    font-size: 15.5px;
+    color: var(--muted);
+    max-width: 56ch;
+  }
+
+  .disclaimer {
+    margin-top: 18px;
+    padding: 12px 15px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent-dim);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .mode-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .mode-tab {
+    flex: 1;
+    background: var(--panel-2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 12px;
+    font-size: 13.5px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .mode-tab.active {
+    background: rgba(226,84,42,0.12);
+    color: var(--accent);
+    border-color: var(--accent-dim);
+  }
+
+  .hsn-hint {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 11px 13px;
+  }
+
+  .hsn-hint strong { color: var(--text); }
+
+  form {
+    margin-top: 32px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .row2 { display: flex; gap: 12px; }
+  .row2 > * { flex: 1; }
+
+  label {
+    display: block;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  input {
+    width: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 11px 13px;
+    color: var(--text);
+    font-size: 14.5px;
+    font-family: inherit;
+    outline: none;
+  }
+
+  input:focus { border-color: var(--accent-dim); }
+
+  button {
+    margin-top: 4px;
+    background: var(--accent);
+    color: #1A0D07;
+    border: none;
+    border-radius: 7px;
+    padding: 13px 18px;
+    font-size: 14.5px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  button:hover { background: #EC6B42; }
+  button:disabled { background: var(--panel-2); color: var(--muted); cursor: not-allowed; }
+
+  .status {
+    margin-top: 18px;
+    padding: 13px 15px;
+    border-radius: 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13.5px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .status.active { display: flex; }
+
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .err {
+    margin-top: 18px;
+    padding: 13px 15px;
+    border-radius: 8px;
+    background: rgba(226,84,42,0.08);
+    border: 1px solid var(--accent);
+    color: #F0A184;
+    font-size: 13.5px;
+    display: none;
+  }
+
+  .err.active { display: block; }
+
+  .results { margin-top: 32px; display: none; }
+  .results.active { display: block; }
+
+  .results-head {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .results-head-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+
+  .results-head-row .results-head {
+    padding-bottom: 0;
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .pdf-btn {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 14px;
+    font-size: 12.5px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .pdf-btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+
+  @media print {
+    body.modal-open { overflow: visible; }
+    .modal-overlay, .eyebrow, .lede, .disclaimer, #searchForm, .status,
+    .pdf-btn, .checklist-progress, footer, .check-box svg,
+    .footer-links { display: none !important; }
+    body { background: #fff; color: #111; }
+    .wrap { max-width: 100%; padding: 0; }
+    h1 { display: none; }
+    .results { display: block !important; }
+    .panel, .weak-item, .maint-row, .recall-item, .check-item,
+    .comparable-card { border-color: #ccc !important; }
+    .block-label, .results-head { color: #111 !important; }
+    .weak-text p, .maint-name, .recall-desc, .comparable-note,
+    .check-label { color: #333 !important; }
+    .check-item { break-inside: avoid; }
+    .check-box { border-color: #333 !important; }
+    .check-item.checked .check-box { background: #333 !important; border-color: #333 !important; }
+    .check-item.checked .check-box svg { display: block !important; opacity: 1 !important; }
+    .check-item.checked .check-box svg path { stroke: #fff !important; }
+    a[href]:after { content: " (" attr(href) ")"; font-size: 10px; color: #666; }
+  }
+
+  .block { margin-bottom: 32px; }
+
+  .block-label {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  /* weak points */
+  .weak-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .weak-item:last-child { border-bottom: none; }
+
+  .weak-mark {
+    color: var(--accent);
+    font-size: 15px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .weak-text strong {
+    display: block;
+    font-size: 14.5px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+
+  .weak-text p {
+    color: var(--muted);
+    font-size: 13.5px;
+  }
+
+  /* maintenance table */
+  .maint-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 14px;
+  }
+
+  .maint-row:last-child { border-bottom: none; }
+
+  .maint-name { font-size: 14px; flex: 1; }
+
+  .maint-interval {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--accent);
+    background: rgba(226,84,42,0.1);
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* checklist */
+  .check-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    font-size: 14px;
+    align-items: flex-start;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .check-box {
+    width: 17px;
+    height: 17px;
+    border: 1.5px solid var(--muted);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s, border-color 0.12s;
+  }
+
+  .check-box svg {
+    width: 11px;
+    height: 11px;
+    opacity: 0;
+    transition: opacity 0.1s;
+  }
+
+  .check-item.checked .check-box {
+    background: var(--ok);
+    border-color: var(--ok);
+  }
+
+  .check-item.checked .check-box svg { opacity: 1; }
+
+  .check-item.checked .check-label {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--border);
+  }
+
+  .recall-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .recall-item:last-child { border-bottom: none; }
+
+  .recall-mark {
+    color: var(--accent);
+    font-size: 14px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .recall-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 3px;
+  }
+
+  .recall-title {
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+
+  .recall-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .recall-desc {
+    color: var(--muted);
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+
+  .no-recalls {
+    font-size: 13.5px;
+    color: var(--muted);
+    padding: 4px 0;
+  }
+
+  .checklist-progress {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .comparable-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .comparable-card {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 15px;
+  }
+
+  .comparable-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .comparable-note {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12.5px;
+  }
+
+  .footer-links {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .footer-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12.5px;
+  }
+
+  .footer-links a:hover { color: var(--accent); text-decoration: underline; }
+  .footer-links span { color: var(--border); }
+
+  .legal-box {
+    max-width: 560px;
+    max-height: 78vh;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .legal-box p { font-size: 13.5px; margin-bottom: 14px; }
+  .legal-box p strong { color: var(--text); }
+
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .modal-close:hover { color: var(--text); border-color: var(--accent-dim); }
+
+  .empty {
+    margin-top: 24px;
+    color: var(--muted);
+    font-size: 13.5px;
+    text-align: center;
+    padding: 20px;
+    display: none;
+  }
+
+  /* Disclaimer modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,12,14,0.72);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+
+  .modal-overlay.hidden { display: none; }
+
+  .modal-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 12px;
+    max-width: 440px;
+    width: 100%;
+    padding: 26px 26px 22px;
+  }
+
+  .modal-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(226,84,42,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    color: var(--accent);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+  }
+
+  .modal-box h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    letter-spacing: -0.005em;
+  }
+
+  .modal-box p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .modal-box ul {
+    margin: 10px 0 16px 18px;
+    padding: 0;
+  }
+
+  .modal-box li {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+
+  .modal-box button {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  body.modal-open { overflow: hidden; }
+    h1 { font-size: 26px; }
+    .row2 { flex-direction: column; }
+    .comparable-grid { grid-template-columns: 1fr; }
+  }
+</style>
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+
+<div class="modal-overlay" id="disclaimerModal">
+  <div class="modal-box">
+    <div class="modal-icon">!</div>
+    <h3>Bevor du startest</h3>
+    <p>Kaufcheck ist eine unverbindliche Orientierungshilfe, keine geprüfte Fachauskunft.</p>
+    <ul>
+      <li>Die Angaben zu Schwachstellen und Wartungsintervallen stammen aus öffentlicher Websuche — keine Garantie auf Richtigkeit oder Vollständigkeit.</li>
+      <li>Es wird keine Haftung für Entscheidungen übernommen, die auf Basis dieser Angaben getroffen werden.</li>
+      <li>Vor dem Kauf immer zusätzlich Serviceheft, HU-Berichte und eine unabhängige Ankaufsuntersuchung einholen.</li>
+    </ul>
+    <button type="button" id="acceptDisclaimer">Verstanden, weiter</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="eyebrow"><span class="dot"></span>Kaufcheck — Live-Demo</div>
+  <h1>Modell eingeben, Schwachstellen kennen.</h1>
+  <p class="lede">Marke, Modell, Baujahr und Motor eingeben — die Demo durchsucht Foren, Testberichte und bekannte Quellen und erstellt daraus eine individuelle Checkliste mit Schwachstellen und Wartungsintervallen.</p>
+  <div class="disclaimer">Ergebnisse sind eine Orientierung auf Basis öffentlicher Quellen, keine Garantie.</div>
+
+  <form id="searchForm">
+    <div class="mode-tabs">
+      <button type="button" class="mode-tab active" id="tabModel" data-mode="model">Marke &amp; Modell</button>
+      <button type="button" class="mode-tab" id="tabHsn" data-mode="hsn">HSN &amp; TSN</button>
+    </div>
+
+    <div id="modelFields">
+      <div class="row2">
+        <div>
+          <label for="model">Marke &amp; Modell</label>
+          <input type="text" id="model" placeholder="z. B. VW Golf 7">
+        </div>
+        <div>
+          <label for="year">Baujahr</label>
+          <input type="text" id="year" placeholder="z. B. 2016">
+        </div>
+      </div>
+      <div>
+        <label for="engine">Motor / Variante</label>
+        <input type="text" id="engine" placeholder="z. B. 1.4 TSI 125 PS, Motorcode falls bekannt">
+      </div>
+    </div>
+
+    <div id="hsnFields" style="display:none;">
+      <div class="row2">
+        <div>
+          <label for="hsn">HSN</label>
+          <input type="text" id="hsn" placeholder="z. B. 0603" maxlength="4">
+        </div>
+        <div>
+          <label for="tsn">TSN</label>
+          <input type="text" id="tsn" placeholder="z. B. AGV" maxlength="4">
+        </div>
+      </div>
+      <div class="hsn-hint">
+        Beides steht auf deiner <strong>Zulassungsbescheinigung Teil I</strong> (Fahrzeugschein): HSN in Feld <strong>2.1</strong>, TSN in Feld <strong>2.2</strong> — meist direkt nebeneinander oben auf dem Dokument.
+      </div>
+    </div>
+
+    <button type="button" id="submitBtn">Checkliste erstellen</button>
+  </form>
+
+  <div class="status" id="status">
+    <div class="spinner"></div>
+    <span id="statusText">Durchsuche Fachforen…</span>
+  </div>
+
+  <div class="err" id="err"></div>
+  <div class="empty" id="emptyHint">Keine ausreichenden Informationen gefunden. Versuch eine gängigere Modell-/Motorbezeichnung.</div>
+
+  <div class="results" id="results">
+    <div class="results-head-row">
+      <div class="results-head" id="resultsHead"></div>
+      <button type="button" id="downloadPdfBtn" class="pdf-btn">PDF herunterladen</button>
+    </div>
+
+    <div class="block">
+      <div class="block-label">Bekannte Schwachstellen</div>
+      <div id="weakPoints"></div>
+    </div>
+
+    <div class="block">
+      <div class="block-label">Wartungsintervalle</div>
+      <div id="maintenance"></div>
+    </div>
+
+    <div class="block">
+      <div class="block-label">Rückrufaktionen</div>
+      <div id="recalls"></div>
+    </div>
+
+    <div class="block">
+      <div class="block-label">Worauf beim Kauf achten</div>
+      <div class="checklist-progress" id="checklistProgress"></div>
+      <div id="checklist"></div>
+    </div>
+
+    <div class="block">
+      <div class="block-label">Vergleichbare Modelle</div>
+      <div id="comparable" class="comparable-grid"></div>
+    </div>
+  </div>
+
+  <footer>
+    Demo-Zweck — ersetzt keine professionelle Ankaufsuntersuchung. Quellen variieren je nach Modell und Verfügbarkeit öffentlicher Informationen.
+    <div class="footer-links">
+      <a href="#" id="openImpressum">Impressum</a>
+      <span>·</span>
+      <a href="#" id="openDatenschutz">Datenschutz</a>
+    </div>
+  </footer>
+
+</div>
+
+<div class="modal-overlay hidden" id="impressumModal">
+  <div class="modal-box legal-box">
+    <button type="button" class="modal-close" data-close="impressumModal">×</button>
+    <h3>Impressum</h3>
+    <p><strong>Angaben gemäß § 5 DDG</strong></p>
+    <p>
+      Sten Peter Koletzki<br>
+      August-Bebel-Str. 14<br>
+      39443 Staßfurt<br>
+      Deutschland
+    </p>
+    <p><strong>Kontakt</strong><br>E-Mail: stenkoletzki@gmail.com</p>
+    <p><strong>Haftungshinweis</strong><br>Kaufcheck ist ein Demo-/Testangebot ohne Gewähr auf Richtigkeit oder Vollständigkeit der bereitgestellten Informationen. Für Entscheidungen auf Basis der Ergebnisse wird keine Haftung übernommen.</p>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="datenschutzModal">
+  <div class="modal-box legal-box">
+    <button type="button" class="modal-close" data-close="datenschutzModal">×</button>
+    <h3>Datenschutzerklärung</h3>
+    <p><strong>1. Verantwortlicher</strong><br>
+      Sten Peter Koletzki, August-Bebel-Str. 14, 39443 Staßfurt<br>
+      E-Mail: stenkoletzki@gmail.com</p>
+    <p><strong>2. Welche Daten werden erhoben</strong><br>
+      Diese Website sammelt keine personenbezogenen Daten über ein Formular. Bei Nutzung der Checkliste werden die eingegebenen Fahrzeugdaten (Modell, Baujahr, Motor bzw. HSN/TSN) zur Erstellung der Ergebnisse an einen KI-Dienst zur Verarbeitung übermittelt — dabei handelt es sich um Fahrzeugangaben, keine personenbezogenen Daten. Es werden dabei serverseitig keine Suchanfragen dauerhaft gespeichert.</p>
+    <p><strong>3. Zweck der Verarbeitung</strong><br>
+      Die Fahrzeugdaten werden ausschließlich verwendet, um die angezeigte Checkliste (Schwachstellen, Wartungsintervalle, Rückrufe) zu erstellen.</p>
+    <p><strong>4. Rechtsgrundlage</strong><br>
+      Art. 6 Abs. 1 lit. f DSGVO — berechtigtes Interesse an der Bereitstellung der angefragten Funktion.</p>
+    <p><strong>5. Weitergabe an Dritte</strong><br>
+      Zur Erstellung der Ergebnisse wird die Anfrage an die Anthropic API (KI-Dienst) übermittelt. Es findet keine weitere Weitergabe an Dritte statt.</p>
+    <p><strong>6. Cookies &amp; Analyse</strong><br>
+      Diese Website nutzt Vercel Web Analytics zur anonymisierten Auswertung von Seitenaufrufen (z.B. Anzahl Besuche, grobe Herkunft, verwendete Geräte). Dabei werden keine Cookies gesetzt und keine einzelnen Besucher wiedererkennbar nachverfolgt — die Daten werden aggregiert erfasst. Anbieter: Vercel Inc.</p>
+    <p><strong>7. Deine Rechte</strong><br>
+      Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO) sowie ein Beschwerderecht bei einer Datenschutz-Aufsichtsbehörde. Wende dich dafür an die oben genannte E-Mail-Adresse.</p>
+  </div>
+</div>
+
+<script>
+document.body.classList.add('modal-open');
+document.getElementById('acceptDisclaimer').addEventListener('click', () => {
+  document.getElementById('disclaimerModal').classList.add('hidden');
+  document.body.classList.remove('modal-open');
+});
+
+const submitBtn = document.getElementById('submitBtn');
+const modelFields = document.getElementById('modelFields');
+const hsnFields = document.getElementById('hsnFields');
+const tabModel = document.getElementById('tabModel');
+const tabHsn = document.getElementById('tabHsn');
+let searchMode = 'model';
+
+function setMode(mode) {
+  searchMode = mode;
+  const isModel = mode === 'model';
+  modelFields.style.display = isModel ? '' : 'none';
+  hsnFields.style.display = isModel ? 'none' : '';
+  tabModel.classList.toggle('active', isModel);
+  tabHsn.classList.toggle('active', !isModel);
+  errEl.classList.remove('active');
+}
+
+tabModel.addEventListener('click', () => setMode('model'));
+tabHsn.addEventListener('click', () => setMode('hsn'));
+
+document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+  window.print();
+});
+
+function openLegalModal(id) {
+  document.getElementById(id).classList.remove('hidden');
+  document.body.classList.add('modal-open');
+}
+function closeLegalModal(id) {
+  document.getElementById(id).classList.add('hidden');
+  document.body.classList.remove('modal-open');
+}
+
+document.getElementById('openImpressum').addEventListener('click', (e) => {
+  e.preventDefault();
+  openLegalModal('impressumModal');
+});
+document.getElementById('openDatenschutz').addEventListener('click', (e) => {
+  e.preventDefault();
+  openLegalModal('datenschutzModal');
+});
+document.querySelectorAll('.modal-close').forEach(btn => {
+  btn.addEventListener('click', () => closeLegalModal(btn.dataset.close));
+});
+document.getElementById('impressumModal').addEventListener('click', (e) => {
+  if (e.target.id === 'impressumModal') closeLegalModal('impressumModal');
+});
+document.getElementById('datenschutzModal').addEventListener('click', (e) => {
+  if (e.target.id === 'datenschutzModal') closeLegalModal('datenschutzModal');
+});
+
+const statusEl = document.getElementById('status');
+const statusText = document.getElementById('statusText');
+const errEl = document.getElementById('err');
+const resultsEl = document.getElementById('results');
+const emptyHint = document.getElementById('emptyHint');
+
+const statusMessages = [
+  'Durchsuche Fachforen…',
+  'Prüfe Testberichte…',
+  'Sammle Wartungsintervalle…',
+  'Stelle Checkliste zusammen…'
+];
+
+submitBtn.addEventListener('click', async () => {
+  const model = document.getElementById('model').value.trim();
+  const year = document.getElementById('year').value.trim();
+  const engine = document.getElementById('engine').value.trim();
+  const hsn = document.getElementById('hsn').value.trim();
+  const tsn = document.getElementById('tsn').value.trim();
+
+  errEl.classList.remove('active');
+  resultsEl.classList.remove('active');
+  emptyHint.style.display = 'none';
+
+  let userRequest;
+
+  if (searchMode === 'hsn') {
+    if (!hsn || !tsn) {
+      errEl.textContent = 'Bitte HSN und TSN eingeben.';
+      errEl.classList.add('active');
+      return;
+    }
+    userRequest = `HSN: ${hsn}\nTSN: ${tsn}`;
+  } else {
+    if (!model) {
+      errEl.textContent = 'Bitte mindestens Marke und Modell eingeben.';
+      errEl.classList.add('active');
+      return;
+    }
+    userRequest = [
+      `Modell: ${model}`,
+      year ? `Baujahr: ${year}` : null,
+      engine ? `Motor/Variante: ${engine}` : null
+    ].filter(Boolean).join('\n');
+  }
+
+  submitBtn.disabled = true;
+  statusEl.classList.add('active');
+
+  let msgIndex = 0;
+  statusText.textContent = statusMessages[0];
+  const interval = setInterval(() => {
+    msgIndex = (msgIndex + 1) % statusMessages.length;
+    statusText.textContent = statusMessages[msgIndex];
+  }, 2000);
+
+  try {
+    const response = await fetch('/api/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(
+        searchMode === 'hsn'
+          ? { mode: 'hsn', hsn, tsn }
+          : { mode: 'model', model, year, engine }
+      )
+    });
+
+    const parsed = await response.json();
+
+    if (!response.ok) {
+      throw new Error(parsed.error || ('Serverfehler: ' + response.status));
+    }
+    const yearValid = parsed.year_valid !== false;
+    const yearNote = parsed.year_note || '';
+    const weakPoints = parsed.weak_points || [];
+    const maintenance = parsed.maintenance || [];
+    const recalls = parsed.recalls || [];
+    const checklist = parsed.checklist || [];
+    const comparableModels = parsed.comparable_models || [];
+
+    clearInterval(interval);
+    statusEl.classList.remove('active');
+    submitBtn.disabled = false;
+
+    if (!yearValid) {
+      errEl.textContent = yearNote || 'Dieses Modell wurde im angegebenen Baujahr nicht produziert. Bitte Baujahr prüfen.';
+      errEl.classList.add('active');
+      return;
+    }
+
+    if (weakPoints.length === 0 && maintenance.length === 0 && checklist.length === 0) {
+      emptyHint.style.display = 'block';
+      return;
+    }
+
+    document.getElementById('resultsHead').textContent =
+      parsed.identified_vehicle || (model + (year ? ' · ' + year : '') + (engine ? ' · ' + engine : ''));
+
+    const weakEl = document.getElementById('weakPoints');
+    weakEl.innerHTML = '';
+    weakPoints.forEach(w => {
+      const div = document.createElement('div');
+      div.className = 'weak-item';
+      div.innerHTML = `
+        <span class="weak-mark">▸</span>
+        <div class="weak-text">
+          <strong></strong>
+          <p></p>
+        </div>
+      `;
+      div.querySelector('strong').textContent = w.title || '';
+      div.querySelector('p').textContent = w.description || '';
+      weakEl.appendChild(div);
+    });
+
+    const maintEl = document.getElementById('maintenance');
+    maintEl.innerHTML = '';
+    maintenance.forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'maint-row';
+      div.innerHTML = `
+        <span class="maint-name"></span>
+        <span class="maint-interval"></span>
+      `;
+      div.querySelector('.maint-name').textContent = m.item || '';
+      div.querySelector('.maint-interval').textContent = m.interval || '';
+      maintEl.appendChild(div);
+    });
+
+    const recallsEl = document.getElementById('recalls');
+    recallsEl.innerHTML = '';
+    if (recalls.length === 0) {
+      const none = document.createElement('div');
+      none.className = 'no-recalls';
+      none.textContent = 'Keine dokumentierten Rückrufaktionen gefunden.';
+      recallsEl.appendChild(none);
+    } else {
+      recalls.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'recall-item';
+        div.innerHTML = `
+          <span class="recall-mark">▸</span>
+          <div style="flex:1;">
+            <div class="recall-top">
+              <span class="recall-title"></span>
+              <span class="recall-date"></span>
+            </div>
+            <div class="recall-desc"></div>
+          </div>
+        `;
+        div.querySelector('.recall-title').textContent = r.title || '';
+        div.querySelector('.recall-date').textContent = r.date || '';
+        div.querySelector('.recall-desc').textContent = r.description || '';
+        recallsEl.appendChild(div);
+      });
+    }
+
+    const checkEl = document.getElementById('checklist');
+    const progressEl = document.getElementById('checklistProgress');
+    checkEl.innerHTML = '';
+
+    const updateProgress = () => {
+      const total = checklist.length;
+      const done = checkEl.querySelectorAll('.check-item.checked').length;
+      progressEl.textContent = done + ' / ' + total + ' erledigt';
+    };
+
+    checklist.forEach(c => {
+      const div = document.createElement('div');
+      div.className = 'check-item';
+      div.innerHTML = `
+        <span class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6L9 17L4 12" stroke="#14171A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="check-label"></span>
+      `;
+      div.querySelector('.check-label').textContent = c;
+      div.addEventListener('click', () => {
+        div.classList.toggle('checked');
+        updateProgress();
+      });
+      checkEl.appendChild(div);
+    });
+
+    updateProgress();
+
+    const compEl = document.getElementById('comparable');
+    compEl.innerHTML = '';
+    comparableModels.forEach(c => {
+      const div = document.createElement('div');
+      div.className = 'comparable-card';
+      div.innerHTML = `
+        <div class="comparable-name"></div>
+        <div class="comparable-note"></div>
+      `;
+      div.querySelector('.comparable-name').textContent = c.name || '';
+      div.querySelector('.comparable-note').textContent = c.note || '';
+      compEl.appendChild(div);
+    });
+
+    resultsEl.classList.add('active');
+
+  } catch (e) {
+    clearInterval(interval);
+    statusEl.classList.remove('active');
+    submitBtn.disabled = false;
+    errEl.textContent = 'Etwas ist schiefgelaufen: ' + e.message + ' — versuch es nochmal.';
+    errEl.classList.add('active');
+  }
+});
+</script>
+</body>
+</html>
