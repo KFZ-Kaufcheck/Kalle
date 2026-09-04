@@ -81,7 +81,7 @@ Regeln:
 - "checklist" soll modellspezifisch sein, nicht generische Ratschläge.
 - "comparable_models" sind echte, existierende Fahrzeuge in ähnlicher Klasse/Preissegment.`;
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Nur POST-Anfragen erlaubt.' });
   }
